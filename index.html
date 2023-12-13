@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Simulation World with Errors</title>
+	<link href="https://fonts.cdnfonts.com/css/lilliput-steps" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri/dist/galmuri.css">
+	<link rel="icon" type="image/png" sizes="32x32" href="favivi.png">
+	<style type="text/css">
+		html {
+        font-family: "Galmuri9", sans-serif;
+    }
+		body, div, p, section{
+			margin: 0; 
+			padding: 0;
+		}
+		body{
+			overflow: hidden;
+			/*background-color: lightgrey;*/
+		}
+        img{position: absolute;}
+
+        img:hover{
+        	mix-blend-mode: plus-lighter;
+        }
+        .random-text {
+		    position: absolute;
+		    color: red; 
+		    font-size: 2.4rem;
+		    background-color: yellow;
+		    z-index: 100;
+		    
+		    padding: 3px;
+		}
+		.hi{
+			position: absolute;
+			color: blue;
+			font-size: 5rem;
+			z-index:200;
+			left: 30px;
+			top: 20px;
+			cursor: default;
+			text-shadow: 2px 2px 4px black;
+		}
+		.hi:hover{
+			color: red;
+		}
+	</style>
+</head>
+<body>
+	<body onclick="redirectToNextPage()">
+	<p class="hi">Warning!
+	<br>There's an error in <br>the simulation!!
+<script type="text/javascript">
+	function redirectToNextPage() {
+        window.location.href = "error.html";
+    }
+
+    /* 이미지 오류 */
+
+    let positionX1 = 0;
+	let positionY1 = 0;
+
+	let positionX2 = 0;
+	let positionY2 = 0;
+
+	let positionX3 = 0;
+	let positionY3 = 0;
+
+	let positionX4 = 0;
+	let positionY4 = 0;
+
+	function moveAndCloneImage1() {
+	 
+	    const movingImage = document.createElement('img');
+	    movingImage.src = 'hello.png'; 
+	    movingImage.alt = 'move1';
+
+	    movingImage.style.transform = `translate(${positionX1}px, -${positionY1}px)`;
+	    movingImage.style.bottom = '-2px';
+	    movingImage.style.left = '0';
+
+	    document.body.appendChild(movingImage);
+
+	    positionY1 += 10;
+	    positionX1 += -6;
+
+	    setTimeout(moveAndCloneImage1, 1000);
+	}
+
+	function moveAndCloneImage2() {
+    const movingImage = document.createElement('img');
+    movingImage.src = 'hi.png';
+    movingImage.alt = 'move2';
+
+    movingImage.style.transform = `translate(${positionY2}px, ${positionX2}px)`;
+    movingImage.style.top = '200px';
+    movingImage.style.right = '0';
+    movingImage.style.width = '400px';
+
+    document.body.appendChild(movingImage);
+
+    positionX2 += 5;
+
+    setTimeout(moveAndCloneImage2, 400);
+	}
+
+	function moveAndCloneImage3() {
+    const movingImage = document.createElement('img');
+    movingImage.src = 'ye.png';
+    movingImage.alt = 'move3';
+
+    movingImage.style.transform = `translate(${positionX3}px, ${positionY3}px)`;
+    movingImage.style.top = '-70px';
+    movingImage.style.left = '500px';
+    movingImage.style.width = '600px';
+    movingImage.style.zIndex = '3';
+
+    document.body.appendChild(movingImage);
+
+    positionX3 -= 5;
+    positionY3 += 13;
+
+    setTimeout(moveAndCloneImage3, 600);
+}
+
+	function moveAndCloneImage4() {
+    const movingImage = document.createElement('img');
+    movingImage.src = 'ho.png';
+    movingImage.alt = 'move4';
+
+    movingImage.style.transform = `translate(${positionX4}px, ${positionY4}px)`;
+    movingImage.style.bottom = '-50px';
+    movingImage.style.right = '-50px';
+    movingImage.style.width = '400px';
+    movingImage.style.zIndex = '-3';
+
+    document.body.appendChild(movingImage);
+
+    positionX4 -= 20;
+    positionY4 -= 13;
+
+    setTimeout(moveAndCloneImage4, 200);
+}
+
+setTimeout(moveAndCloneImage1, 1000);
+setTimeout(moveAndCloneImage2, 400);
+setTimeout(moveAndCloneImage3, 600);
+setTimeout(moveAndCloneImage4, 200);
+
+	/* 글자 생성 */
+
+	const textArray = ['e', 'r', 'o'];
+
+    function generateRandomText() {
+ 
+      const randomIndex = Math.floor(Math.random() * textArray.length);
+      const randomText = textArray[randomIndex];
+
+      const text = document.createElement('div');
+      text.className = 'random-text';
+      text.innerText = randomText;
+
+      const maxX = window.innerWidth - text.clientWidth;
+      const maxY = window.innerHeight - text.clientHeight;
+
+      const randomX = Math.floor(Math.random() * maxX);
+      const randomY = Math.floor(Math.random() * maxY);
+
+      text.style.left = `${randomX}px`;
+      text.style.top = `${randomY}px`;
+
+      document.body.appendChild(text);
+    }
+
+    setInterval(generateRandomText, 800);
+</script>
+</body>
+</html>

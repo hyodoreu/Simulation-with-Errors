@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="32x32" href="favivi.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri/dist/galmuri.css">
+
+    <title>Simulator Archive</title>
+    <style type="text/css">
+    html {
+        font-family: "Galmuri9", sans-serif;
+    }
+    body{
+        margin: 0;
+        padding: 0;
+        background-color: springgreen;
+    }
+    #archiveList {
+        list-style: none;
+        padding: 0;
+    }
+
+    .custom-container{
+        position: relative;
+        text-align: center;
+        margin-bottom: 40px;
+        margin-top: 40px;
+    }
+
+    img {
+        display: block;
+        margin: 10px auto;
+        max-width: 100%;
+        height: auto;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        transition: filter 0.3s;
+        display: inline-block;
+        border: none;
+        z-index: 3;
+    }
+
+    .center{
+        width:60vw;
+        height: auto;
+        background-color: blue;
+        position: absolute;
+        top: 0;
+        left: 20%;
+        z-index: -100;
+        max-height: 100vh;
+    }
+    .outer-container{
+        width: 900px;
+        position: relative;
+        text-align: center;
+        margin-left: 35%;
+    }
+    .simulator-text {
+        width: 150px;
+        height: auto;
+        padding: 5px 0px;
+        position: absolute; 
+        writing-mode: inherit;
+        right:800px; 
+        font-size: 1.3rem;
+        background-color: lime;
+        display: flex;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+        z-index: 0;
+    }
+    .simulator-text:hover{
+        background-color: blue;
+        color: white;
+        writing-mode: vertical-rl;
+        text-orientation: upright;
+        width: 50px;
+    }
+    .time-text{
+        width: 100px;
+        height: auto;
+        padding: 5px 0px;
+        position: absolute;
+        top:60px;
+        z-index: -10;
+        writing-mode: inherit;
+        text-orientation: upright;
+        left:2px;
+        font-size: 1rem;
+        background-color: yellow;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    .back{
+        width: 300px;
+        position: absolute;
+        border: none;
+        top: 20px;
+        left: 40px;
+    }
+    </style>
+</head>
+<body>
+    <a href="error.html" target="_self">
+          <img src="archive.png" class="back" alt="BackImage" style="stroke: none;">
+        </a>
+    <div class="archivebox" id="archiveList">
+    </div>
+    <div class="center"></div>
+    <script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+    
+    const archiveData = JSON.parse(localStorage.getItem('screenshotArchive')) || [];
+
+    const customList = document.getElementById('archiveList');
+
+    if (customList) {
+
+        for (let data of archiveData.reverse()) {
+            
+            const outerContainer = document.createElement('div');
+            outerContainer.className = 'outer-container';
+
+            const customContainer = document.createElement('div');
+            customContainer.className = 'custom-container';
+            const simulatorTexts = document.querySelectorAll('.simulator-text');
+        simulatorTexts.forEach(function(simulatorText) {
+            simulatorText.style.backgroundColor = getRandomColor();
+        });
+            
+            const image = new Image();
+            image.src = data.imageDataURL;
+            image.style.maxWidth = '100%';
+
+            
+            const customTextContainer = document.createElement('div');
+
+            
+            const simulatorText = document.createElement('div');
+            simulatorText.className = 'simulator-text'; 
+            simulatorText.innerHTML = `${data.worldName}`;
+            customTextContainer.appendChild(simulatorText);
+
+            
+            const timeText = document.createElement('div');
+            timeText.className = 'time-text';
+            timeText.innerHTML = `${data.screenshotTime}`;
+            customTextContainer.appendChild(timeText);
+
+            
+            customContainer.appendChild(customTextContainer);
+
+            
+            customTextContainer.style.textAlign = 'center';
+            image.style.display = 'block';
+            image.style.margin = '0 auto';
+
+            
+            customContainer.appendChild(image);
+
+            
+            outerContainer.appendChild(customContainer);
+
+            
+            customList.appendChild(outerContainer);
+
+        }
+
+        } else {
+            console.error('Element with id "archiveList" not found.');
+        }
+    });
+
+
+    function getRandomColor() {
+        
+        const r = Math.floor(Math.random() * 256);
+        const g = Math.floor(Math.random() * 256);
+        const b = Math.floor(Math.random() * 256);
+
+        
+        return `rgb(${r}, ${g}, ${b})`;
+    }
+        
+        const simulatorText = document.querySelector('.simulator-text');
+        simulatorText.style.backgroundColor = getRandomColor();
+
+    </script>
+
+</body>
+</html>
