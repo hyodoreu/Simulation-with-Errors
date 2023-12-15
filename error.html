@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Simulation with Errors</title>
+	<link href="https://fonts.cdnfonts.com/css/lilliput-steps" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@500&display=swap" rel="stylesheet">
+	<link rel="icon" type="image/png" sizes="32x32" href="favivi.png">
+	<style type="text/css">
+		html{
+			font-family: 'Lilliput Steps', sans-serif;
+		}
+		body, div, p, section{
+			margin: 0; 
+			padding: 0;
+		}
+		body{
+			overflow: hidden;
+		}
+		#mainBox{
+			width: 100vw; 
+			height: 100vh;
+			left: 50%; 
+			top: 50%; 
+			transform: translate(-50%,-50%); 
+			position: absolute;
+		}
+	     #dataCanv {
+	    	display: none;
+	  	}	
+	  	select::-ms-expand{display: none;}
+  		select{
+  		  	/*-o-appearance: none;
+		  	-webkit-appearance: none;
+		  	-moz-appearance: none;
+		  	appearance: none;*/
+		  	background: yellow;
+		  	margin-left: 10px;
+		  	padding:3px;
+		  	outline: none;
+		  	z-index: 12;
+		  	font-family: 'Lilliput Steps', sans-serif;
+		  	background-color: blue;
+  			color: white;
+  			margin-top: 10px;
+  		}
+  		select, option{
+  			padding:3px;
+  			outline: none;
+  			z-index: 10;
+  			border: none;
+			text-align: center;
+		    text-decoration: none;
+		    display: inline-block;
+		    font-size: 1rem;
+  		}
+  		select:hover{
+  			background: yellow;
+  			color: black;
+  		}
+  		#canv{
+  			position: absolute;
+  			top:0;
+  			right: 0;
+  			text-align: center; 
+  		}
+  		#mainBox{
+  			z-index: -1000;
+  		}
+  		.imageBox img{
+  			z-index: 0;
+  			padding: 0;
+  			margin: 0;
+  			width: 100%;
+  			height: auto;
+  			position: absolute;
+  			right: 0;
+  			bottom: 0;
+  		}
+  		.imageBox{
+  			margin: 0;
+  			padding: 0;
+  			width: 100vw; 
+			height: 100vh;
+			left: 50%; 
+			top: 50%; 
+			transform: translate(-50%,-50%); 
+			position: absolute;
+			display: flex;
+  			flex-direction: column;
+  			z-index: 9;
+  			bottom: 0;
+  		}
+  		.hidden {
+      		display: none;
+   		}
+   		button{
+   			position: relative;
+   			padding: 6px 6px;
+   			z-index: 10;
+   			font-family: 'Lilliput Steps', sans-serif;
+			font-weight:600;
+			font-size: 1.2rem;
+			background-color: yellow;
+			border: none;
+			text-align: center;
+		    text-decoration: none;
+		    display: inline-block;
+		    width: 160px;
+		    color: black;
+		    margin-bottom: 7px;
+		    margin-top: 3px;
+   		}
+   		button:hover{
+   			background-color: blue;
+   			color: whitesmoke;
+   		}
+   		.date {
+	      	color: blue;
+	      	font-weight: bold;
+	      	font-size: 1rem;
+	      	z-index: 100;
+	      	bottom: -300;
+	      	margin-top: 500px;
+	      	position: absolute;
+	      	right: 18px;
+	    }
+	    .leftBox{
+	    	padding-right: 10px;
+	    	position: absolute;
+	    	width: 273px;
+	    	height: 100vh;
+	    	right: 0;
+	    	top: 0;
+	    	z-index: 100;
+	    	background-color: lightgrey;
+	    	overflow-y: scroll;
+	    	text-align: center;
+	    }
+	    .leftBox::-webkit-scrollbar {
+		    width: 10px;
+		    background-color: blue;
+		  }
+		.leftBox::-webkit-scrollbar-thumb {
+    		background-color: yellow;
+  		}
+  		.leftBox::-webkit-scrollbar-track {
+    		background-color: grey;
+	    }
+	    .world{
+	    	font-size: 2rem;
+	    	color:yellow;
+	    	text-align: center;
+	    	padding-top: 7px;
+	    	margin-bottom: 2px;
+
+	    }
+	    .world:hover{
+	    	color: blue;
+	    }
+	    .eff{
+	    	font-size: 1.2rem;
+	    	color: blue;
+	    	text-align: center;
+	    	padding-top:20px;
+	    }
+	    .screenshotOverlay {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-60%, -50%);
+            max-width: 800px;
+            width: 80%;
+            background-color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+        }
+        .overlayInput {
+            margin-top: 10px;
+        }
+        #closeScreenshotOverlay{
+        	font-family: 'Noto Sans', sans-serif;
+        	position: absolute;
+        	top: -30px;
+        	right: 0;
+        	width: 30px;
+        }
+        #screenshotImage {
+		  display: block; 
+		  margin: 0 auto; 
+		}
+        #shot{
+        	width: 300px;
+        	font-size: 1.5;
+        	margin-top: 10px;
+        	margin-bottom: 10px;
+        }
+        .blink{
+        	animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+	      0% { opacity: 1; }
+	      50% { opacity: 0; }
+	      100% { opacity: 1; }
+	    }
+        #click{
+        	position: absolute;
+        	top: -5px;
+        	right: 283px;
+        	width: 30px;
+        	/*writing-mode: vertical-rl;
+  			text-orientation: upright;*/
+  			background-color: red;
+  			color:black;
+  			text-align: center;
+  			
+  		}
+
+  		#click:hover{
+  			color: white;
+  			width: 60px;
+  		}
+  		#click:hover p{
+  			margin-right: 15px;
+  		}
+        #archivebu{
+        	/*writing-mode: vertical-rl;
+  			text-orientation: upright;*/
+  			color: black;
+  			background-color: orange;
+  			width: 30px;	
+        }
+        #archivebu:hover{
+  			background-color: blue;
+  			color: white;
+  		}
+  		label{
+  			font-size: 1.5rem;
+  		}
+  		.archive{
+	    	width: 130px;
+	    	z-index: 22;
+	    	position: absolute;
+	    	display: none;
+	    	left: 0px;
+	    	top: 0px;
+	    	
+	    }
+	    .archivebox{
+	    	width: 30px;
+	    	height: auto;
+	    	position: absolute;
+	    	background-color: orange;
+	    	top: 165px;
+        	right: 283px;
+        	z-index: 20;
+	    }
+	    .archivebox:hover {
+            width: 130px;
+            height: 130px;
+        }
+
+        .archivebox:hover .archive {
+            display: block;
+            text-align: center;
+        }
+        .archivebox:hover #archivebu {
+            display: none;
+        }
+        .say{
+        	color: red;
+        	line-height: 20px;
+        }
+        .say:hover{
+        	color: blue;
+        }
+        .index{
+        	margin-top: 50px;
+        }
+        .index:hover{
+        	color: red;
+        }
+	</style>
+</head>
+<body id="total">
+	<button onclick="captureScreenshot()" id="click"><p class="blink">C<br>l<br>i<br>c<br>k<br>!</p></button>
+	<div class="archivebox"> 
+		<button id="archivebu">A<br>r<br>c<br>h<br>i<br>v<br>e</button>
+		<a href="archive.html" target="_self">
+		  <img src="archive.png" class="archive" alt="Archive Image">
+		</a>
+	</div>
+
+	<!-- 스크린샷 -->
+
+    <div class="screenshotOverlay" id="screenshotOverlay">
+        <img alt="Screenshot" id="screenshotImage" style="max-width: 100%;" src="">
+        <div class="overlayInput">
+            <label for="SimulatorName" id="label">Simulator Name:</label>
+            <input type="text" id="SimulatorName" placeholder="시뮬레이터 이름을 지어주세요." style="height: 30px; text-align: center; width: 200px;">
+            <button id="closeScreenshotOverlay" onclick="closeScreenshotOverlay()">x</button>
+        </div>
+        <button onclick="saveScreenshot()" id="shot">Save</button>
+        <p id="screenshotTime"></p>
+    </div>
+	<div class="imageBox">
+  		<img id="image1" src="safari.gif" alt="Image 1" class="hidden">
+  		<img id="image2" src="crosswalk.gif" alt="Image 2" class="hidden">
+  		<img id="image3" src="boom.gif" alt="Image 3" class="hidden">
+  		<img id="image4" src="ocean.gif" alt="Image 4" class="hidden">
+  		<img id="image5" src="mountain.gif" alt="Image 5" class="hidden" style="right: 30px;">
+	</div>
+	<div class="leftBox">
+		<p class="world">Simulation with Errors</p>
+		<button onclick="toggleImage('image5', 'button5')" id="button5">mountain</button>
+		<button onclick="toggleImage('image1', 'button1')" id="button1" style="margin-top:10px;">safari</button>
+		<button onclick="toggleImage('image3', 'button3')" id="button3">boom</button>
+		<button onclick="toggleImage('image2', 'button2')" id="button2">crosswalk</button>
+		<button onclick="toggleImage('image4', 'button4')" id="button4">ocean</button>
+		<p class="eff">Simulator Effects<br>↓</p>
+		<tr>
+			<td valign = "bottom">
+			    <select id = "transformSelector" onchange = "transformSelector_valueChange();">
+			    	<option value = "T_lagY">
+			          Lag with y
+			        </option>
+			    	<option value = "T_vfreeze">
+			          Freeze (vertical)
+			        </option>
+			        <option value = "T_hfreeze">
+			          Freeze (horizontal)
+			        </option>
+			        <option value = "T_lagT">
+			          Lag with t
+			        </option>
+			        <option value = "T_lagDX">
+			          Lag with X
+			        </option>
+			        <option value = "T_colors">
+			          Colors
+			        </option>
+			        <option value = "T_ghost">
+			          Ghost
+			        </option>
+			        <option value = "T_shadow">
+			          Shadow
+			        </option>
+			        <option value = "T_lagBrightness">
+			          Lag brightness
+			        </option>
+			    </select>
+
+			    <!-- display none 영역 -->
+
+			    <input type = "text" id = "resolutionFactorTxt" value = "0.35" style = "width:30px; display: none;" onkeydown = "if(event.keyCode == 13) updateResolutionFactor();" >
+			        <div id = "optionsDiv">
+			        <div style = "display: none;" class = "effectEditorContainer">
+			          <textarea spellcheck = "false" style = "resize: none; width:100%;height:200px;border:0px solid black;padding:0px;white-space: nowrap;" id = "transformTxt"></textarea>
+			        </div>
+			    </div>
+			</td>
+		</tr>
+		<img src="man.gif">
+		<p class="say">
+			Make the weirdest simulator in the world. LOL~
+		</p>
+		<p id="index" style="margin-top:30px; font-size: 1.4rem;">
+			@hyodoreu_u
+		</p>
+	</div>
+
+	<!-- 웹캠 영역 -->
+
+	<div id="mainBox">
+		<canvas id = "dataCanv" style = "background-color:blue;">
+		</canvas>
+		<video id = "vid" autoplay style = "display: none;"></video>
+		<table style = "width:100%;height:100%;" cellspacing = "0px" cellpadding = "0px">
+		  <tr>
+		    <td style = "text-align:center;height:100%;font-size:0px;" valign = "middle">
+		      <canvas id = "canv" autoplay style = "margin-bottom:0px;vertical-align:middle; width:100%;height:100%;">
+		     
+		      </canvas>
+		    </td>
+		  </tr>
+		</table>
+	</div>
+
+<script type="text/javascript">
+
+	/* 이미지 */
+
+	let lastClickedButton = null;
+
+    function toggleImage(imageId, buttonId) {
+        const selectedImage = document.getElementById(imageId);
+        const selectedButton = document.getElementById(buttonId);
+
+        /* 현재 클릭된 버튼이 이미 클릭된 버튼과 같은지 확인 */
+
+        if (lastClickedButton !== selectedButton) {
+
+            /* 초기화 */
+
+            if (lastClickedButton !== null) {
+                lastClickedButton.style.backgroundColor = '';
+                lastClickedButton.style.color = '';
+            }
+
+            hideAllImages();
+
+            /* 새로운 이미지 보이게 */
+            selectedImage.style.display = 'block';
+            selectedButton.style.backgroundColor = 'blue';
+            selectedButton.style.color = 'white';
+
+            
+            lastClickedButton = selectedButton;
+        } else {
+
+            /* 이미 클릭된 버튼을 다시 클릭한 경우 이미지와 버튼 초기화 */
+
+            selectedImage.style.display = 'none';
+            selectedButton.style.backgroundColor = '';
+            selectedButton.style.color = '';
+            lastClickedButton = null;
+        }
+    }
+
+    function hideAllImages() {
+
+        /* 이미지 숨기기 */
+
+        const allImages = document.querySelectorAll('.imageBox img');
+        allImages.forEach(image => {
+            image.style.display = 'none';
+        });
+    }
+
+    /* 타이머 */
+
+    function formatDate(date) {
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      const seconds = date.getSeconds().toString().padStart(2, '0');
+
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
+    function updateDate() {
+      const currentDateInSeconds = Math.floor(Date.now() / 1000);
+      const currentDate = new Date(currentDateInSeconds * 1000);
+      const formattedKoreanDate = formatDate(currentDate);
+    }
+    setInterval(updateDate, 1000);
+    updateDate();
+
+    /* 스크린샷 */
+	function getCurrentTime() {
+	  try {
+	    const currentDate = new Date();
+	    const formattedTime = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1)
+	      .toString()
+	      .padStart(2, '0')}-${currentDate.getDate().toString().padStart(2, '0')} ${currentDate
+	        .getHours()
+	        .toString()
+	        .padStart(2, '0')}:${currentDate.getMinutes().toString().padStart(2, '0')}:${currentDate
+	          .getSeconds()
+	          .toString()
+	          .padStart(2, '0')}`;
+	    return formattedTime;
+	  } catch (error) {
+	    console.error('Error in getCurrentTime:', error.message);
+	    return 'Error retrieving time';
+	  }
+	}
+
+	function screenShot(input, output) {
+	  const targetElement = document.getElementById(input);
+	  const screenshotImage = document.getElementById(output);
+
+	  if (!targetElement) {
+	    console.error(`Element with id "${input}" not found.`);
+	    return;
+	  }
+
+	  html2canvas(targetElement, {
+
+	    onrendered: function (canvas) {
+	  console.log('Screenshot captured successfully:', canvas);
+
+	  if (output == null) {
+	    document.body.appendChild(canvas);
+	  } else {
+
+	    screenshotImage.onload = function() {
+	      console.log('Screenshot image loaded successfully.');
+	    };
+	    screenshotImage.src = canvas.toDataURL('image/png');
+	  }
+	}
+	  });
+	}
+
+	function captureScreenshot() {
+	  const screenshotOverlay = document.getElementById('screenshotOverlay');
+	  const screenshotTime = document.getElementById('screenshotTime');
+
+	  screenshotTime.textContent = getCurrentTime();
+	  screenshotOverlay.style.display = 'block';
+
+	  screenShot("mainBox", "screenshotImage");
+
+	}
+
+	function saveScreenshot() {
+	  const worldName = document.getElementById('SimulatorName').value;
+	  const screenshotOverlay = document.getElementById('screenshotOverlay');
+	  const screenshotTime = document.getElementById('screenshotTime');
+
+	  console.log('Simulator Name:', SimulatorName);
+	  console.log('Screenshot Time:', screenshotTime.textContent);
+
+	  screenshotOverlay.style.display = 'none';
+	}
+
+	function closeScreenshotOverlay() {
+	  const screenshotOverlay = document.getElementById('screenshotOverlay');
+	  screenshotOverlay.style.display = 'none';
+	}
+
+
+
+
+
+	/* 시뮬레이터 아카이브 저장 */
+
+	function saveScreenshot() {
+  const worldName = document.getElementById('SimulatorName').value;
+  const screenshotOverlay = document.getElementById('screenshotOverlay');
+  const screenshotTime = document.getElementById('screenshotTime');
+  const screenshotImage = document.getElementById('screenshotImage');
+
+  // 이미지를 저장할 canvas 생성
+  const canvas = document.createElement('canvas');
+  canvas.width = 700;
+  canvas.height = 500;
+  const context = canvas.getContext('2d');
+  context.drawImage(screenshotImage, 0, 0, canvas.width, canvas.height);
+
+  // 저장할 데이터 생성
+  const imageDataURL = canvas.toDataURL('image/png');
+  const archiveData = {
+    worldName: worldName,
+    screenshotTime: screenshotTime.textContent,
+    imageDataURL: imageDataURL,
+  };
+
+  // archive.html에 데이터 추가 (여기서는 가정으로 localStorage 사용)
+  let archive = JSON.parse(localStorage.getItem('screenshotArchive')) || [];
+  archive.push(archiveData);
+  localStorage.setItem('screenshotArchive', JSON.stringify(archive));
+
+  // 디버깅을 위해 console에 로그 출력
+  console.log('Simulator Name:', worldName);
+  console.log('Screenshot Time:', screenshotTime.textContent);
+  console.log('Screenshot Data:', archiveData);
+
+  // 스크린샷 오버레이 숨기기
+  screenshotOverlay.style.display = 'none';
+}
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-alpha1/html2canvas.min.js"></script>
+
+
+<script type="text/javascript">
+
+	/* var */
+
+	var vid = $('vid');
+	var canv = $('canv');
+	var ctx = canv.getContext('2d');
+	var dataCanv = $('dataCanv');
+	var dataCtx = dataCanv.getContext('2d');
+	var optionsDiv = $('optionsDiv');
+	var transformSelector = $('transformSelector');
+	  
+	var imageWidth = 0;
+	var imageHeight = 0;
+	  
+	var canvWidth = 0;
+	var canvHeight = 0;
+	  
+	var mouseX = 0;
+	var mouseY = 0;
+	  
+	var rawVideoWidth = 0;
+	var rawVideoHeight = 0;
+	  
+	var savedFrames = 100;
+	var currentTime = 0;
+	var rawVideoData = new Array();
+	  
+	var resolutionFactor = 1;
+	var grabDisplayData = false;
+	var displayData;
+	  	  
+	var live = false;
+	  
+	var transforms = new Array();
+	  
+	function avgColors(arr)
+	{
+	    var retVal = new Array();
+	    for(var i in arr)
+	    {
+	      for(var j in arr[i])
+	      {
+	        if(!(j in retVal)) retVal[j] = 0;
+	        retVal[j] += arr[i][j];
+	      }
+	    }
+	    
+	    for(var j in retVal)
+	    {
+	      retVal[j] = Math.round(retVal[j] / arr.length);
+	    }
+	    
+	    return retVal;
+	}
+	
+	/* 웹캠 사이즈 */
+
+	function setCanvSize()
+	{
+	    canv.style.display = 'none';
+	  
+	    canvHeight = 1000;
+	    canvWidth = 2000;
+	    
+	    canv.width = canvWidth;
+	    canv.height = canvHeight;
+	    
+	    canv.style.display = '';
+
+	}
+	  
+	function videoHandler(stream)
+	{
+	    console.log("videoHandler");
+	    vid.srcObject = stream;
+	}
+	  
+	function transformSelector_valueChange()
+	{
+	    if(transformSelector.value != 'T_custom')
+	    {
+	      setTransformTxtValue();
+	    }
+	    else
+	    {
+	      toggleOptions(true);
+	    }
+	}
+	  
+	function setTransformTxtValue()
+	{
+	    var s = "" + transforms[transformSelector.value];
+	    
+	    s = s.replace(/.*\n.*\n/, '');
+	    s = s.substr(0, s.length - 2);
+	    s = s.replace(/ /g, String.fromCharCode(160));
+	    transformTxt.value = s;
+	    
+	    if(live) setParametersAndTransform();
+	}
+	  
+	function $(id)
+	{
+	    return document.getElementById(id);
+	}
+	  
+	function playbackStarted()
+	{
+	    live = true;
+	  
+	    rawVideoWidth = vid.videoWidth;
+	    rawVideoHeight = vid.videoHeight;
+	    
+	    setTimeout(setCanvSize, 0);
+	    updateResolutionFactor();
+
+	    setParametersAndTransform();
+	    timer();
+	}
+	  
+	function canv_mousemove(evt)
+	{
+	    mouseX = evt.clientX - canv.offsetLeft - canv.parentNode.offsetLeft;
+	    mouseY = evt.clientY - canv.offsetTop - canv.parentNode.offsetLeft;
+	    
+	    mouseX *= imageWidth / canvWidth;
+	    mouseY *= imageHeight / canvHeight;
+	}
+	  
+	function timer()
+	{
+	    try
+	    {
+	      dataCtx.drawImage(vid, 0, 0, imageWidth, imageHeight);
+	      
+	      currentTime++;
+	      transformImage();
+	      paintImage();
+	      
+	      setTimeout(timer, 0);
+	    }
+	    catch(e)
+	    {
+	      setTimeout(playbackStarted, 0);
+	    }
+
+	}
+	  
+	function paintImage()
+	{
+	    ctx.drawImage(dataCanv, 0, 0, canvWidth, canvHeight);
+	}
+	  
+	function setParametersAndTransform()
+	{
+	    if(transformSelector.value != 'T_custom')
+	    {
+	      transforms[transformSelector.value]();
+	    }
+	    else
+	    {
+	      eval(transformTxt.value);
+	    }
+	  
+	    startOver();
+	}
+	  
+	function startOver()
+	{
+	    currentTime = 0;
+	    rawVideoData = new Array();
+	}
+	  
+	function updateResolutionFactor()
+	{
+	    resolutionFactor = parseFloat($('resolutionFactorTxt').value);
+	    
+	    imageWidth = rawVideoWidth * resolutionFactor;
+	    imageHeight = rawVideoHeight * resolutionFactor;
+	    
+	    dataCanv.width = imageWidth;
+	    dataCanv.height = imageHeight;
+	    
+	    startOver();
+	}
+	  
+	function rawVideo(x, y, t)
+	{
+	    var retVal = [0, 0, 0];
+	    var i = index(x, y);
+	    if(t in rawVideoData && i in rawVideoData[t])
+	    {
+	      retVal[0] = rawVideoData[t][i];
+	      retVal[1] = rawVideoData[t][i + 1];
+	      retVal[2] = rawVideoData[t][i + 2];
+	    }
+	    return retVal;
+	}
+	  
+	function displayedFrame(x, y) {
+    var newY = Math.round(y * canvHeight / imageHeight);
+    var newX = Math.round(x * canvWidth / imageWidth);
+    
+    // 이 부분 수정
+    var index = (displayData.width * newY + newX) * 4;
+    
+    if (index < 0 || index >= displayData.data.length) {
+        // 인덱스가 유효하지 않을 경우 [0, 0, 0]을 반환하거나 다른 적절한 처리를 수행하세요.
+        return [0, 0, 0];
+    }
+    
+    return [displayData.data[index], displayData.data[index + 1], displayData.data[index + 2]];
+}
+	  
+	function transformImage()
+	{
+	    var d = dataCtx.getImageData(0, 0, imageWidth, imageHeight);
+	    var i = 0;
+	    
+	    if(grabDisplayData)
+	    {
+	      displayData = ctx.getImageData(0, 0, canvWidth, canvHeight);
+	    }
+	    
+	    rawVideoData[currentTime] = new Array();
+	    if(rawVideoData.length > savedFrames)
+	    {
+	      delete rawVideoData[currentTime - savedFrames];
+	    }
+	    
+	    for(i = 0; i < d.data.length; i++)
+	    {
+	      if(i % 4 != 3) rawVideoData[currentTime][i] = d.data[i];
+	    }
+	    
+	    for(var y = 0; y < imageHeight; y++)
+	    {
+	      for(var x = 0; x < imageWidth; x++)
+	      {
+	        i = index(x, y);
+	        var c = newColor(x, y, currentTime);
+	        
+	        d.data[i] = c[0];
+	        d.data[i + 1] = c[1];
+	        d.data[i + 2] = c[2];
+	      }
+	    }
+	    
+	    dataCtx.putImageData(d, 0, 0);
+	}
+	  
+	function body_resize()
+	  {
+	    if(rawVideoWidth != 0 && rawVideoHeight != 0)
+	    {
+	      setCanvSize();
+	    }
+	    console.log('sup');
+	}
+	  
+	function index(x, y)
+	  {
+	    return (imageWidth*y + x)*4;
+	}
+	  
+	function errorHandler(err)
+	  {
+	    console.log("error: " + err);
+	    
+	    for(p in err)
+	    {
+	      console.log("  " + p + ": " + err[p]);
+	    }
+	}
+	  
+	  async function init() {
+	    console.log("init");
+	    vid.addEventListener('play', playbackStarted);
+
+	    try {
+	    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+	    videoHandler(stream);
+		}  catch (e) {
+	        errorDiv.style.display = '';
+	        errorDiv.innerHTML += "<br>error: " + e.messageText;
+	    }
+
+	    body_resize();
+	    toggleOptions();
+	    setTransformTxtValue();
+	}
+		
+
+	/* 효과 버튼 */
+	   
+	transforms['T_rand'] = function()
+	{
+	savedFrames = 15;
+
+	newColor = function(x, y, t)
+	{
+	  var sourceX = imageWidth - x - 1;
+	  var sourceY = y;
+	  var sourceT = t - Math.floor(Math.random() * savedFrames);
+
+	  return rawVideo(sourceX, sourceY, sourceT);
+	};
+	};
+
+	transforms['T_lagY'] = function()
+	{
+	savedFrames = 80;
+
+	newColor = function(x, y, t)
+	{
+	  var sourceX = imageWidth - x - 1;
+	  var sourceY = y;
+	  var sourceT = t - Math.floor(savedFrames / imageHeight * y);
+
+	  return rawVideo(sourceX, sourceY, sourceT);
+	};
+	};
+
+	transforms['T_shadow'] = function()
+	{
+	savedFrames = 20;
+
+	newColor = function(x, y, t)
+	{
+	  var sourceX = imageWidth - x - 1;
+	  var sourceY = y;
+	  var c1 = rawVideo(sourceX, sourceY, t);
+	  var c2 = rawVideo(sourceX, sourceY, t - savedFrames + 1);
+	  var retVal = [0.5*(c1[0] + c2[0]), 0.5*(c1[1] + c2[1]), 0.5*(c1[2] + c2[2])];
+
+	  return retVal;
+	};
+	};
+
+	transforms['T_lagMouseY'] = function()
+	{
+	savedFrames = 80;
+
+	newColor = function(x, y, t)
+	{
+	  var sourceX = imageWidth - x - 1;
+	  var sourceY = y;
+	  var sourceT = t - Math.floor(savedFrames / imageHeight * mouseY);
+
+	  return rawVideo(sourceX, sourceY, sourceT);
+	};
+	};
+
+	transforms['T_lagDX'] = function()
+	{
+	savedFrames = 80;
+
+	newColor = function(x, y, t)
+	{
+	  var sourceX = imageWidth - x - 1;
+	  var sourceY = y;
+	  var sourceT = t - Math.floor(savedFrames / imageWidth * Math.abs(x - mouseX));
+
+	  return rawVideo(sourceX, sourceY, sourceT);
+	};
+	};
+
+	transforms['T_lagT'] = function()
+	{
+	savedFrames = 80;
+
+	newColor = function(x, y, t)
+	{
+	  var sourceX = imageWidth - x - 1;
+	  var sourceY = y;
+	  var sourceT = Math.round(t - 0.5*(savedFrames - 1) + 0.5*(savedFrames - 1)*Math.sin(2*Math.PI * t/(savedFrames-1)));
+
+	  return rawVideo(sourceX, sourceY, sourceT);
+	};
+	};
+
+	transforms['T_lagBrightness'] = function()
+	{
+	savedFrames = 80;
+
+	newColor = function(x, y, t)
+	{
+	  var sourceX = imageWidth - x - 1;
+	  var sourceY = y;
+	  var currentRawColor = rawVideo(sourceX, sourceY, t);
+	  var brightness = currentRawColor[0] + currentRawColor[1] + currentRawColor[2];
+	  var sourceT = t - Math.floor(brightness / (255 * 3) * savedFrames);
+
+	  return rawVideo(sourceX, sourceY, sourceT);
+	};
+	};
+
+	transforms['T_colors'] = function()
+	{
+	savedFrames = 50;
+
+	newColor = function(x, y, t)
+	{
+	  var sourceX = imageWidth - x - 1;
+	  var sourceY = y;
+	  var c1 = rawVideo(sourceX, sourceY, t);
+	  var c2 = rawVideo(sourceX, sourceY, t - Math.floor(savedFrames / 2));
+	  var c3 = rawVideo(sourceX, sourceY, t - savedFrames + 1);
+	  var retVal = [c1[0], c2[1], c3[2]];
+
+	  return retVal;
+	};
+	};
+
+	transforms['T_ghost'] = function()
+	{
+	savedFrames = 80;
+
+	newColor = function(x, y, t)
+	{
+	  var sourceX = imageWidth - x - 1;
+	  var sourceY = y;
+	  var c1 = rawVideo(sourceX, sourceY, t);
+	  var c2 = rawVideo(sourceX, sourceY, t - savedFrames + 1);
+	  var f = 0.5 * (Math.sin(t/20) + 1);
+	  
+	  return [f * c1[0] + (1 - f) * c2[0], f * c1[1] + (1 - f) * c2[1], f * c1[2] + (1 - f) * c2[2]];
+	};
+	};
+
+	transforms['T_copies'] = function()
+	{
+	savedFrames = 20;
+
+	newColor = function(x, y, t)
+	{
+	  var sourceX = imageWidth - x - 1;
+	  var sourceY = y;
+	  var c1 = rawVideo(sourceX, sourceY, t);
+	  var c2 = rawVideo(sourceX, sourceY, t - savedFrames + 1);
+	  var b1 = c1[0] + c1[1] + c1[2];
+	  var b2 = c2[0] + c2[1] + c2[2];
+
+	  if(b1 > b2) return c1;
+	  return c2;
+	};
+	};
+
+	transforms['T_vfreeze'] = function()
+	{
+	savedFrames = 300;
+
+	newColor = function(x, y, t)
+	{
+	  if (Math.abs(y - (t % savedFrames) / savedFrames * imageHeight) < 1) {
+	    return [255, 255, 0];
+	  } else {
+	    var sourceX = imageWidth - x - 1;
+	    var sourceY = y;
+	    var sourceT = Math.min(t, savedFrames * Math.floor(t / savedFrames) + Math.floor(y / imageHeight * savedFrames));
+
+	    return rawVideo(sourceX, sourceY, sourceT);
+	  }
+	};
+	}
+
+	transforms['T_hfreeze'] = function()
+	{
+	savedFrames = 300;
+
+	newColor = function(x, y, t)
+	{
+	  if (Math.abs(x - (t % savedFrames) / savedFrames * imageWidth) < 1) {
+	    return [255, 255, 0];
+	  } else {
+	    var sourceX = imageWidth - x - 1;
+	    var sourceY = y;
+	    var sourceT = Math.min(t, savedFrames * Math.floor(t / savedFrames) + Math.floor(x / imageWidth * savedFrames));
+
+	    return rawVideo(sourceX, sourceY, sourceT);
+	  }
+	};
+	}
+	/* 수정된 효과들 실행 */
+	init();
+</script>
+
+
+</body>
+</html>
